@@ -106,9 +106,7 @@ const Upload: React.FC = () => {
         setUploadedFile(tempUploadedFile)
         let tempFilesList = filesStatusList
         tempFilesList.splice(index, index + 1)
-        console.log(tempFilesList)
         setFilesStatusList(tempFilesList)
-        console.log('文件上传完成')
         let waitUploadFilesTemp = waitUploadFiles
         waitUploadFiles.splice(index, index + 1)
         setWaitUploadFiles(waitUploadFilesTemp)
@@ -117,7 +115,9 @@ const Upload: React.FC = () => {
     const mergeProcess = (index: number): void => {
         console.log(`${filesStatusList[index].fileStaticMessage.fileName}上传完成`)
     }
-
+    const getExtendName = (nameStr: string) => (
+        nameStr.split('.')[nameStr.split('.').length - 1]
+    )
     const mergeRequest = (id: string, index: number) => (
         request({
             method: 'post',
@@ -126,7 +126,7 @@ const Upload: React.FC = () => {
             updateUploadProcess: mergeProcess,
             data: JSON.stringify({
                 filename: filesStatusList[index].fileUploadMessage.hash,
-                newname: filesStatusList[index].fileStaticMessage.fileName,
+                newname: `${filesStatusList[index].fileUploadMessage.hash}.${getExtendName(filesStatusList[index].fileStaticMessage.fileName)}`,
                 size: filesStatusList[index].fileStaticMessage.fileSize,
                 chunkSize: chunkSize
             }),
