@@ -4,10 +4,11 @@ import { getFileChunkList } from '../utils/createFilesChunksLists'
 import { calculatehash } from '../utils/createHash'
 import request from '../utils/request'
 import servicePath from '../utils/Apiurl'
+import { isMainThread } from 'worker_threads'
 
 const Upload: React.FC = () => {
     const [filesStatusList, setFilesStatusList] = useState<any>([])
-    const [waitUploadFiles, setWaitUploadFiles] = useState<Array<File>>([])
+    const [waitUploadFiles, setWaitUploadFiles] = useState<Array<any>>([])
     const [uploadedFile, setUploadedFile] = useState<any>([])
     // 待上传文件修改后执行的操作
     useEffect(() => {
@@ -28,6 +29,7 @@ const Upload: React.FC = () => {
                 }
             }
         )))
+
         changeFilesHash(waitUploadFiles.map(item => (
             {
                 id: `${item.name}_${new Date().getTime()}`,
@@ -39,7 +41,7 @@ const Upload: React.FC = () => {
                 fileUploadMessage: {
                     showMessage: '正在处理文件',
                     status: 'waitCalHash',
-                    isHashCalculateComplete: false,
+                    isHashCalculateComplete: item.isHashCalculateComplete || false,
                     uploadProcess: 0,
                     chunkLists: getFileChunkList(item, chunkSize),
                 }
@@ -73,8 +75,32 @@ const Upload: React.FC = () => {
     const handleFilechange = async (e: any) => {
         updateWaitUploadFiles(e.target.files)
     }
-
+    const verifyProcess = (index: number) => {
+        console.log(`收到文件${filesStatusList[index].fileStaticMessage.fileName}的验证返回信息`)
+    }
+    const verify = (index: number) => (
+        request({
+            url: servicePath.verify,
+            method: 'post',
+            headers: {
+                "content-type": "application/json"
+            },
+            data: JSON.stringify({
+                fileName: filesStatusList[index].fileStaticMessage.fileName,
+                fileHash: filesStatusList[index].fileUploadMessage.hash
+            }),
+            updateUploadProcess: verifyProcess,
+            index: index
+        })
+    )
     const uploadFile = async (id: string, index: number) => {
+        let verifyRes: any = await verify(index)
+        verifyRes = JSON.parse(verifyRes.data)
+        if(verifyRes.status == 1) {
+            console.log(`文件hash存在, 终止上传切片, 跳转至文件上传完成处理函数`)
+            completeFile(verifyRes, index)
+            return
+        }
         let filesStatusListTemp = filesStatusList.slice()
         let requestList: any[] = []
         let requestArr = filesStatusListTemp[index].fileUploadMessage.chunkLists.map((item: { file: Blob }, _index: number) => {
@@ -104,8 +130,9 @@ const Upload: React.FC = () => {
             linkUrl: data.url
         })
         setUploadedFile(tempUploadedFile)
-        let tempFilesList = filesStatusList
+        let tempFilesList = filesStatusList.slice()
         tempFilesList.splice(index, index + 1)
+        console.log(tempFilesList)
         setFilesStatusList(tempFilesList)
         let waitUploadFilesTemp = waitUploadFiles
         waitUploadFiles.splice(index, index + 1)
@@ -295,7 +322,7 @@ const Upload: React.FC = () => {
                         textAlign: 'center'
                     }}>
                         <a>{item.linkUrl}</a>
-                        </div>
+                    </div>
                 </li>
             ))}
         </ul>
