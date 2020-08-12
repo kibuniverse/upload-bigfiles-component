@@ -4,7 +4,6 @@ import { getFileChunkList } from '../utils/createFilesChunksLists'
 import { calculatehash } from '../utils/createHash'
 import request from '../utils/request'
 import servicePath from '../utils/Apiurl'
-import { isMainThread } from 'worker_threads'
 
 const Upload: React.FC = () => {
     const [filesStatusList, setFilesStatusList] = useState<any>([])
@@ -48,23 +47,26 @@ const Upload: React.FC = () => {
             }
         )))
     }, [waitUploadFiles])
-    useEffect(() => {
-        console.log(filesStatusList)
-    }, [filesStatusList])
     const changeFilesHash = async (filesList: any) => {
+        console.log(filesList)
         for (let i = 0, len = filesList.length; i < len; i++) {
             if (filesList[i].fileUploadMessage.isHashCalculateComplete === false) {
                 let res = await calculatehash(filesList[i].fileUploadMessage.chunkLists)
+                filesList[i].fileUploadMessage.chunkLists.forEach((item: any, index: number) => {
+                    item.hash = `${res}_${index}`
+                })
                 filesList[i].fileUploadMessage.hash = res
+                filesList[i].fileUploadMessage.totalChunksNumber = filesList[i].fileUploadMessage.chunkLists.length
                 filesList[i].fileUploadMessage.status = 'waitUpload'
                 filesList[i].fileUploadMessage.showMessage = '等待上传'
                 filesList[i].fileUploadMessage.isHashCalculateComplete = true
             }
         }
+
         setFilesStatusList(filesList)
     }
     // 切片的文件大小
-    const chunkSize = 10 * 1024 * 1024
+    const chunkSize = 5 * 1024 * 1024
 
     // 更新待上传文件数组信息
     const updateWaitUploadFiles = (files: Array<File>) => {
@@ -93,15 +95,27 @@ const Upload: React.FC = () => {
             index: index
         })
     )
+    const updateFileAlreadyUploadChunk = (index: number, uploadedChunksNumber: number) =>{
+        let temp = filesStatusList.slice()
+        temp[index].fileUploadMessage.uploadProcess = uploadedChunksNumber
+        console.log(temp)
+        setFilesStatusList(temp)
+    }
     const uploadFile = async (id: string, index: number) => {
         let verifyRes: any = await verify(index)
         verifyRes = JSON.parse(verifyRes.data)
-        if(verifyRes.status == 1) {
+        console.log(verifyRes)
+        if (verifyRes.status === 1) {
             console.log(`文件hash存在, 终止上传切片, 跳转至文件上传完成处理函数`)
             completeFile(verifyRes, index)
             return
         }
+        updateFileAlreadyUploadChunk(index, verifyRes.AlreadyUploadList.length)
         let filesStatusListTemp = filesStatusList.slice()
+        filesStatusListTemp[index].fileUploadMessage.chunkLists = filesStatusListTemp[index].fileUploadMessage.chunkLists.filter((item: any) => (
+            verifyRes.AlreadyUploadList.indexOf(item.hash) === -1
+        ))
+        return
         let requestList: any[] = []
         let requestArr = filesStatusListTemp[index].fileUploadMessage.chunkLists.map((item: { file: Blob }, _index: number) => {
             const data = new FormData()
@@ -132,7 +146,6 @@ const Upload: React.FC = () => {
         setUploadedFile(tempUploadedFile)
         let tempFilesList = filesStatusList.slice()
         tempFilesList.splice(index, index + 1)
-        console.log(tempFilesList)
         setFilesStatusList(tempFilesList)
         let waitUploadFilesTemp = waitUploadFiles
         waitUploadFiles.splice(index, index + 1)
@@ -207,7 +220,7 @@ const Upload: React.FC = () => {
                     justifyContent: 'center',
                     alignItems: 'center'
                 }}>
-                    <UploadProcess uploadProcess={item.fileUploadMessage.uploadProcess > 0 ? item.fileUploadMessage.uploadProcess / item.fileUploadMessage.chunkLists.length : 0} />
+                    <UploadProcess uploadProcess={item.fileUploadMessage.uploadProcess > 0 ? item.fileUploadMessage.uploadProcess / item.fileUploadMessage.totalChunksNumber : 0} />
                 </div>
                 <div style={{
                     width: '20%',
@@ -225,6 +238,14 @@ const Upload: React.FC = () => {
                     }} onClick={() => uploadFile(item.id, index)}>
                         上传
                     </button>
+                    <button style={{
+                        backgroundColor: `${item.fileUploadMessage.isHashCalculateComplete ? '#42b2ec' : 'gray'}`,
+                        border: 'none',
+                        height: '100%',
+                        color: '#fff',
+                        outline: 'none',
+                        opacity: `${item.fileUploadMessage.isHashCalculateComplete ? 1 : 0}`
+                    }}>暂停</button>
                 </div>
             </li>
         )
