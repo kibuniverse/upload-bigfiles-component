@@ -10,6 +10,7 @@ app.use('*', function (req, res, next) {
     next(); // 链式操作
 });
 //引入中间件
+const Ip = '127.0.0.1'
 var formidable = require('formidable');
 app.use(express.static('bigfiles'))
 //监听路由
@@ -146,7 +147,7 @@ app.post('/verify', async (req, res) => {
             status: 1,
             msg: '文件存在',
             isUpload: true,
-            url: `http://127.0.0.1:8001/${fileHash}.${ext}`
+            url: `http://${ip}:8001/${fileHash}.${ext}`
         }))
         res.end()
     } else {
@@ -169,11 +170,11 @@ app.post('/mergeReq', async (req, res) => {
     res.send(JSON.stringify({
         ok: 1,
         msg: '合并完成',
-        url: `http://127.0.0.1:8001/${data.newname}`
+        url: `http://${ip}:8001/${data.newname}`
     }))
     res.end()
 })
 
 var server = app.listen(8001, function () {
-    console.log("访问地址为 http://127.0.0.1:8001")
+    console.log(`访问地址为 http://${ip}:8001`)
 })
