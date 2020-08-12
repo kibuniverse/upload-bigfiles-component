@@ -43,12 +43,12 @@ const Upload: React.FC = () => {
                     isHashCalculateComplete: item.isHashCalculateComplete || false,
                     uploadProcess: 0,
                     chunkLists: getFileChunkList(item, chunkSize),
+                    isUploading: false
                 }
             }
         )))
     }, [waitUploadFiles])
     const changeFilesHash = async (filesList: any) => {
-        console.log(filesList)
         for (let i = 0, len = filesList.length; i < len; i++) {
             if (filesList[i].fileUploadMessage.isHashCalculateComplete === false) {
                 let res = await calculatehash(filesList[i].fileUploadMessage.chunkLists)
@@ -98,7 +98,6 @@ const Upload: React.FC = () => {
     const updateFileAlreadyUploadChunk = (index: number, uploadedChunksNumber: number) =>{
         let temp = filesStatusList.slice()
         temp[index].fileUploadMessage.uploadProcess = uploadedChunksNumber
-        console.log(temp)
         setFilesStatusList(temp)
     }
     const uploadFile = async (id: string, index: number) => {
@@ -110,13 +109,13 @@ const Upload: React.FC = () => {
             completeFile(verifyRes, index)
             return
         }
-        updateFileAlreadyUploadChunk(index, verifyRes.AlreadyUploadList.length)
+        // updateFileAlreadyUploadChunk(index, verifyRes.AlreadyUploadList.length)
         let filesStatusListTemp = filesStatusList.slice()
         filesStatusListTemp[index].fileUploadMessage.chunkLists = filesStatusListTemp[index].fileUploadMessage.chunkLists.filter((item: any) => (
             verifyRes.AlreadyUploadList.indexOf(item.hash) === -1
         ))
-        return
         let requestList: any[] = []
+        filesStatusListTemp[index].fileUploadMessage.requestList = []
         let requestArr = filesStatusListTemp[index].fileUploadMessage.chunkLists.map((item: { file: Blob }, _index: number) => {
             const data = new FormData()
             data.append('fileData', item.file)
@@ -126,11 +125,15 @@ const Upload: React.FC = () => {
                 method: 'post',
                 url: servicePath.sendChunkRequest,
                 data: data,
-                requestList: requestList,
+                requestList: filesStatusListTemp[index].fileUploadMessage.requestList,
                 index: index,
                 updateUploadProcess: updateFileProcess,
             })
         })
+        filesStatusListTemp[index].fileUploadMessage.isUploading = true
+        filesStatusListTemp[index].fileUploadMessage.uploadProcess = verifyRes.AlreadyUploadList.length
+        
+        setFilesStatusList(filesStatusListTemp)
         await Promise.all(requestArr)
         console.log(`ID为${id}的文件上传完成，准备合并`)
         let res: any = await mergeRequest(id, index)
@@ -179,6 +182,15 @@ const Upload: React.FC = () => {
         let filesStatusListTemp = filesStatusList.slice()
         filesStatusListTemp[index].fileUploadMessage.uploadProcess += 1
         setFilesStatusList(filesStatusListTemp)
+    }
+    const pauseUpload = (index: number) => {
+        console.log(`准备暂停上传${filesStatusList[index].fileStaticMessage.fileName}文件`)
+        let filesStatusListTemp = filesStatusList.slice()
+        console.log(filesStatusListTemp[index].fileUploadMessage.requestList)
+        filesStatusListTemp[index].fileUploadMessage.requestList.forEach((item: XMLHttpRequest) => {
+            item.abort()
+        })
+        console.log(`已暂停上传${filesStatusList[index].fileStaticMessage.fileName}文件`)
     }
     const UploadProcess = (props: any) => {
         return (
@@ -234,6 +246,7 @@ const Upload: React.FC = () => {
                         height: '100%',
                         color: '#fff',
                         outline: 'none',
+                        display: `${item.fileUploadMessage.isUploading? 'none': 'block'}`,
                         opacity: `${item.fileUploadMessage.isHashCalculateComplete ? 1 : 0}`
                     }} onClick={() => uploadFile(item.id, index)}>
                         上传
@@ -244,8 +257,8 @@ const Upload: React.FC = () => {
                         height: '100%',
                         color: '#fff',
                         outline: 'none',
-                        opacity: `${item.fileUploadMessage.isHashCalculateComplete ? 1 : 0}`
-                    }}>暂停</button>
+                        display: `${item.fileUploadMessage.isUploading? 'block': 'none'}`
+                    }} onClick={() => pauseUpload(index)}>暂停</button>
                 </div>
             </li>
         )
