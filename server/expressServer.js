@@ -102,10 +102,10 @@ const mergeFileChunks = async data => {
             )
         )
 
-        // fs.rmdirSync(chunksDir, { recursive: true }, err => {
-        //     console.log(chunksDir)
-        //     console.log(err)
-        // })
+        fs.rmdirSync(chunksDir, { recursive: true }, err => {
+            console.log(chunksDir)
+            console.log(err)
+        })
     })
 }
 /**
