@@ -62,7 +62,6 @@ const Upload: React.FC = () => {
                 filesList[i].fileUploadMessage.isHashCalculateComplete = true
             }
         }
-
         setFilesStatusList(filesList)
     }
     // 切片的文件大小
@@ -95,7 +94,7 @@ const Upload: React.FC = () => {
             index: index
         })
     )
-    const updateFileAlreadyUploadChunk = (index: number, uploadedChunksNumber: number) =>{
+    const updateFileAlreadyUploadChunk = (index: number, uploadedChunksNumber: number) => {
         let temp = filesStatusList.slice()
         temp[index].fileUploadMessage.uploadProcess = uploadedChunksNumber
         setFilesStatusList(temp)
@@ -114,7 +113,6 @@ const Upload: React.FC = () => {
         filesStatusListTemp[index].fileUploadMessage.chunkLists = filesStatusListTemp[index].fileUploadMessage.chunkLists.filter((item: any) => (
             verifyRes.AlreadyUploadList.indexOf(item.hash) === -1
         ))
-        let requestList: any[] = []
         filesStatusListTemp[index].fileUploadMessage.requestList = []
         let requestArr = filesStatusListTemp[index].fileUploadMessage.chunkLists.map((item: { file: Blob }, _index: number) => {
             const data = new FormData()
@@ -132,7 +130,7 @@ const Upload: React.FC = () => {
         })
         filesStatusListTemp[index].fileUploadMessage.isUploading = true
         filesStatusListTemp[index].fileUploadMessage.uploadProcess = verifyRes.AlreadyUploadList.length
-        
+
         setFilesStatusList(filesStatusListTemp)
         await Promise.all(requestArr)
         console.log(`ID为${id}的文件上传完成，准备合并`)
@@ -246,7 +244,7 @@ const Upload: React.FC = () => {
                         height: '100%',
                         color: '#fff',
                         outline: 'none',
-                        display: `${item.fileUploadMessage.isUploading? 'none': 'block'}`,
+                        display: `${item.fileUploadMessage.isUploading ? 'none' : 'block'}`,
                         opacity: `${item.fileUploadMessage.isHashCalculateComplete ? 1 : 0}`
                     }} onClick={() => uploadFile(item.id, index)}>
                         上传
@@ -257,7 +255,7 @@ const Upload: React.FC = () => {
                         height: '100%',
                         color: '#fff',
                         outline: 'none',
-                        display: `${item.fileUploadMessage.isUploading? 'block': 'none'}`
+                        display: `${item.fileUploadMessage.isUploading ? 'block' : 'none'}`
                     }} onClick={() => pauseUpload(index)}>暂停</button>
                 </div>
             </li>

@@ -11,7 +11,6 @@ interface para {
 
 
 export default function requset(paramsObj: para) {
-    console.log(paramsObj)
     const url = paramsObj.url
     const data = paramsObj.data || null
     const method = paramsObj.method || 'post'
@@ -24,8 +23,8 @@ export default function requset(paramsObj: para) {
             xhr.setRequestHeader(key, headers[key])
         })
         xhr.onreadystatechange = () => {
-            if (xhr.readyState == 4) {
-                if ((xhr.status >= 200 && xhr.status <= 300) || xhr.status == 304) {
+            if (xhr.readyState === 4) {
+                if ((xhr.status >= 200 && xhr.status <= 300) || xhr.status === 304) {
                     if (requestList) {
                         const completeXhrIndex = requestList.indexOf(xhr)
                         requestList.splice(completeXhrIndex, 1)
