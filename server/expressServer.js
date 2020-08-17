@@ -10,7 +10,7 @@ app.use('*', function (req, res, next) {
     next(); // 链式操作
 });
 //引入中间件
-const Ip = '127.0.0.1'
+const ip = '127.0.0.1'
 var formidable = require('formidable');
 app.use(express.static('bigfiles'))
 //监听路由
