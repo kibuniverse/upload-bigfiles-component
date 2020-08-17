@@ -28,7 +28,7 @@ const Upload: React.FC = () => {
                 }
             }
         )))
-
+        // 计算文件hash并添加
         changeFilesHash(waitUploadFiles.map(item => (
             {
                 id: `${item.name}_${new Date().getTime()}`,
@@ -79,6 +79,8 @@ const Upload: React.FC = () => {
     const verifyProcess = (index: number) => {
         console.log(`收到文件${filesStatusList[index].fileStaticMessage.fileName}的验证返回信息`)
     }
+
+    // 验证文件是否存在
     const verify = (index: number) => (
         request({
             url: servicePath.verify,
@@ -94,6 +96,8 @@ const Upload: React.FC = () => {
             index: index
         })
     )
+
+    // 文件上传主逻辑
     const uploadFile = async (id: string, index: number) => {
         let verifyRes: any = await verify(index)
         verifyRes = JSON.parse(verifyRes.data)
@@ -133,6 +137,8 @@ const Upload: React.FC = () => {
         let data = JSON.parse(res.data)
         completeFile(data, index)
     }
+
+    // 修改已上传文件信息
     const completeFile = (data: any, index: number) => {
         let tempUploadedFile: any = uploadedFile.slice()
         tempUploadedFile.push({
@@ -147,13 +153,23 @@ const Upload: React.FC = () => {
         waitUploadFiles.splice(index, index + 1)
         setWaitUploadFiles(waitUploadFilesTemp)
     }
-
     const mergeProcess = (index: number): void => {
         console.log(`${filesStatusList[index].fileStaticMessage.fileName}上传完成`)
     }
+
+    /**
+     * 
+     * @param nameStr 文件名
+     * 得到文件后缀
+     */
     const getExtendName = (nameStr: string) => (
         nameStr.split('.')[nameStr.split('.').length - 1]
     )
+    /**
+     * 
+     * @param id 文件对应的id
+     * @param index 文件在文件数组中的下标
+     */
     const mergeRequest = (id: string, index: number) => (
         request({
             method: 'post',
@@ -171,11 +187,17 @@ const Upload: React.FC = () => {
             }
         })
     )
+
+    /**
+     *  更新文件上传的切片数，不负责计算具体的进度
+     * @param index 文件在文件数组中的下标
+     */
     const updateFileProcess = (index: number): void => {
         let filesStatusListTemp = filesStatusList.slice()
         filesStatusListTemp[index].fileUploadMessage.uploadProcess += 1
         setFilesStatusList(filesStatusListTemp)
     }
+    // 暂停上传
     const pauseUpload = (index: number) => {
         console.log(`准备暂停上传${filesStatusList[index].fileStaticMessage.fileName}文件`)
         let filesStatusListTemp = filesStatusList.slice()
