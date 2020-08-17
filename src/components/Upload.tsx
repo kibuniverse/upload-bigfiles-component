@@ -94,11 +94,6 @@ const Upload: React.FC = () => {
             index: index
         })
     )
-    const updateFileAlreadyUploadChunk = (index: number, uploadedChunksNumber: number) => {
-        let temp = filesStatusList.slice()
-        temp[index].fileUploadMessage.uploadProcess = uploadedChunksNumber
-        setFilesStatusList(temp)
-    }
     const uploadFile = async (id: string, index: number) => {
         let verifyRes: any = await verify(index)
         verifyRes = JSON.parse(verifyRes.data)
