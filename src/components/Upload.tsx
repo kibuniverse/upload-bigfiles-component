@@ -307,32 +307,34 @@ const Upload: React.FC = () => {
     }
     const UploadBox = () => (
         <div style={{
-            width: '100px',
-            height: '100px',
-            border: '1px solid gray',
-            borderStyle: 'dotted',
+            width: '400px',
+            height: '200px',
+            border: '2px solid gray',
+            borderStyle: 'dashed',
+            borderRadius: '2%',
             position: 'relative',
             marginBottom: '10px',
-            overflow: 'hidden'
+            backgroundColor: '#f9f9f9'
         }}>
             <input style={{
-                width: '100px',
-                height: '100px',
-                opacity: '0'
+                width: '400px',
+                height: '200px',
+                opacity: '0',
+                zIndex: 10
             }} type='file' onChange={handleFilechange} multiple />
+            <img style={{
+                position: 'absolute',
+                width: '251px',
+                height: '100px',
+                top: '35px',
+                left: '71px',
+            }} src="http://49.234.79.241:8001/66f3aeb62843866ac5f4f957e99b57c4.png" alt="" />
             <div style={{
                 position: 'absolute',
-                left: '43px',
-                top: '17px',
-                color: 'gray',
-                fontSize: '24px'
-            }}>+</div>
-            <div style={{
-                position: 'absolute',
-                top: '63px',
-                left: '18px',
+                top: '149px',
+                left: '109px',
                 color: 'gray'
-            }}>点击上传</div>
+            }}>点击上传或者拖拽上传</div>
         </div>
     )
 
@@ -381,13 +383,13 @@ const Upload: React.FC = () => {
         return (
             <div style={{
                 width: '700px',
-                border: '1px solid gray',
-                borderStyle: 'dotted',
+                border: '1px dashed gray',
                 paddingBottom: '20px',
-                marginBottom: '10px'
+                marginBottom: '10px',
+                opacity: `${filesStatusList.length || uploadedFile.length ? 1: 0}`
             }}>
                 <props.child />
-            </div>
+            </div >
         )
 
     }
@@ -400,7 +402,9 @@ const Upload: React.FC = () => {
         }}>
             <UploadBox />
             <FileStatusBoxHoc child={WaitUploadlist} />
-            <div>已上传文件列表</div>
+            <div style={{
+                opacity: `${filesStatusList.length ? 1: 0}`
+            }}>已上传文件列表</div>
             <FileStatusBoxHoc child={UploadedList} />
         </div >
     )
