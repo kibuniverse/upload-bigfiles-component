@@ -2,13 +2,14 @@
 
 import { UtilClassInterface } from '../interfaces/utilsClassInterface'
 import { IwaitCalculateFiles, IwaitUploadFiles, IuploadingFile } from '../interfaces/interfaces'
+import calculateFileHash from './calculateFileHash'
 export default class DisposeAllData implements UtilClassInterface {
 
     waitCalculateFiles = [] as Array<IwaitCalculateFiles>
     waitUploadFiles = [] as Array<IwaitUploadFiles>
     uploadingFiles = [] as Array<IuploadingFile>
     isCalculating: boolean
-    constructor () {
+    constructor() {
         this.isCalculating = false
     }
     /**
@@ -23,17 +24,19 @@ export default class DisposeAllData implements UtilClassInterface {
                 isCalculate: false
             })
         }
-        if(!this.isCalculating) {
+        if (!this.isCalculating) {
             this.calculateFilesMessage()
         }
     }
     /**
-     * calculateFilesMessage
+     * calculateFilesMessage 获取文件切片以及hash
      */
-    private calculateFilesMessage() {
+    private async calculateFilesMessage() {
         this.isCalculating = true
-        for(let i = 0; i < this.waitCalculateFiles.length; i ++) {
-            
+        console.log(this)
+        while(this.waitCalculateFiles.length) {
+            let file = this.waitCalculateFiles.pop()
+            calculateFileHash(file)
         }
         this.isCalculating = false
     }

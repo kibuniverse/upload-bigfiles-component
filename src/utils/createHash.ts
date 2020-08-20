@@ -13,10 +13,6 @@ const createChunkList = async (files: File, chunkSize: number) => {
         index++;
         cur += chunkSize;
     }
-    // const hash = await calculatehash(fileChunkList)
-    // fileChunkList.forEach((item, index: number) => {
-    //     item.hash = `${hash}_${index}`
-    // })
     return fileChunkList
 }
 const calculatehash = (fileChunkList: any) => (

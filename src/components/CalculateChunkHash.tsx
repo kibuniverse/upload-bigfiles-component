@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { IwaitCalculateFiles } from '../interfaces/files'
+import { IwaitCalculateFiles } from '../interfaces/interfaces'
 export interface Iprops {
     updateWait: (addFiles: FileList | []) => void
     waitCalculateFiles: Array<IwaitCalculateFiles> | []

@@ -1,70 +1,69 @@
 import * as React from 'react'
-import { files, IwaitUploadFiles } from '../interfaces/files'
-import CalculateFileHash from './calculateFileHash'
+import { files, IwaitUploadFiles } from '../interfaces/interfaces'
+import ShowUploadProcess from './ShowUploadProcess'
+import calculateFileHash from '../utils/calculateFileHash'
+import CalculateChunkHash from './CalculateChunkHash'
 class Upload extends React.Component {
 
     readonly state: files = {
-        filesList: [],
-        waitUploadFiles: []
+        waitUploadFiles: [],
+        addFiles: [],
+        waitCalculateFiles: [],
+        uploadingFiles: []
     }
 
-    public handleFilechange = (e: any) => {
+    public handleFilechange = (e: any): void => {
         console.log(e.target.files)
         this.setState({
-            filesList: e.target.files
-        }, () => {
-            console.log(this.state.filesList)
-            CalculateFileHash({
-                fileList: this.state.filesList,
-                updateWaitFileUploadFiles: this.updateWaitFileUploadFiles,
-                chunkSize: 4*1024*1024
-            })
+            waitCalculateFiles: e.target.files
         })
     }
-    public updateWaitFileUploadFiles = (waitUploadFile: IwaitUploadFiles) => {
+    /**
+     * updateWaitCalculateFiles  更新带上传文件数组
+     */
+
+    /**
+     * updateFileList 修改已添加文件数组
+     */
+    public updateWaitUploadFiles = (waitUploadFile: IwaitUploadFiles): void => {
         let temp = this.state.waitUploadFiles.slice()
+        this.state.uploadingFiles[0].
         temp.push(waitUploadFile)
         this.setState({
             waitUploadFiles: temp
-        }, () => {
-            console.log(this.state.waitUploadFiles)
         })
     }
+
+    public completeCalculateChunkHashFiles = (id: string): void => {
+
+    }
+
     public UploadBox = () => (
         <div style={{
             width: '400px',
-            height: '200px',
             border: '2px solid gray',
             borderStyle: 'dashed',
             borderRadius: '2%',
             position: 'relative',
-            marginBottom: '10px',
-            backgroundColor: '#f9f9f9'
+            backgroundColor: '#f9f9f9',
+            margin: '100px auto 20px auto',
+            backgroundImage: 'url("http://49.234.79.241:8001/ddad1a4c0164ed53590ffeb51d0a1a72.png")',
+            backgroundSize: 'cover'
         }}>
             <input style={{
                 width: '400px',
                 height: '200px',
                 opacity: '0'
             }} type='file' onChange={this.handleFilechange} multiple />
-            <img style={{
-                position: 'absolute',
-                width: '251px',
-                height: '100px',
-                top: '35px',
-                left: '71px',
-            }} src="http://49.234.79.241:8001/66f3aeb62843866ac5f4f957e99b57c4.png" alt="" />
-            <div style={{
-                position: 'absolute',
-                top: '149px',
-                left: '109px',
-                color: 'gray'
-            }}>点击上传或者拖拽上传</div>
         </div>
     )
     render() {
         return (
             <>
                 <this.UploadBox />
+                <ShowUploadProcess
+                    fileList={this.state.waitUploadFiles}
+                />
             </>
         )
     }

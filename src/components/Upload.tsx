@@ -11,8 +11,7 @@ const Upload: React.FC = () => {
     const [uploadedFile, setUploadedFile] = useState<any>([])
     // 待上传文件修改后执行的操作
     useEffect(() => {
-        setFilesStatusList(waitUploadFiles.map(item => (
-            {
+        setFilesStatusList(waitUploadFiles.map(item => ({
                 id: `${item.name}_${new Date().getTime()}`,
                 fileStaticMessage: {
                     fileName: item.name,
