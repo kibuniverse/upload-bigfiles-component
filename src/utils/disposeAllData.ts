@@ -2,15 +2,21 @@
 
 import { UtilClassInterface } from '../interfaces/utilsClassInterface'
 import { IwaitCalculateFiles, IwaitUploadFiles, IuploadingFile } from '../interfaces/interfaces'
-import calculateFileHash from './calculateFileHash'
+import getFileChunkList from './getFileChunkHash'
+export interface Iprops {
+    chunkSize: number
+}
+import getFileChunkHash from './getFileChunkHash'
 export default class DisposeAllData implements UtilClassInterface {
 
     waitCalculateFiles = [] as Array<IwaitCalculateFiles>
     waitUploadFiles = [] as Array<IwaitUploadFiles>
     uploadingFiles = [] as Array<IuploadingFile>
     isCalculating: boolean
-    constructor() {
+    chunkSize: number
+    constructor(props: Iprops) {
         this.isCalculating = false
+        this.chunkSize = props.chunkSize ? props.chunkSize : 4 * 1024 * 1024
     }
     /**
      * 
@@ -21,7 +27,6 @@ export default class DisposeAllData implements UtilClassInterface {
             this.waitCalculateFiles.push({
                 id: `${newFiles[i].name}_${new Date().getTime()}`,
                 file: newFiles[i],
-                isCalculate: false
             })
         }
         if (!this.isCalculating) {
@@ -34,9 +39,13 @@ export default class DisposeAllData implements UtilClassInterface {
     private async calculateFilesMessage() {
         this.isCalculating = true
         console.log(this)
-        while(this.waitCalculateFiles.length) {
-            let file = this.waitCalculateFiles.pop()
-            calculateFileHash(file)
+        while (this.waitCalculateFiles.length > 0) {
+            let file: any = this.waitCalculateFiles.shift()?.file
+            let waituploadFile: IwaitUploadFiles = {
+                file: file,
+                chunkList: getFileChunkList(file, this.chunkSize)
+            }
+            let chunks
         }
         this.isCalculating = false
     }
