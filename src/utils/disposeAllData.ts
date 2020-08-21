@@ -1,12 +1,14 @@
 
 
 import { UtilClassInterface } from '../interfaces/utilsClassInterface'
-import { IwaitCalculateFiles, IwaitUploadFiles, IuploadingFile } from '../interfaces/interfaces'
+import { IwaitCalculateFiles, IwaitUploadFiles, IuploadingFile, chunkListsFile } from '../interfaces/interfaces'
 import getFileChunkList from './getFileChunkHash'
-export interface Iprops {
-    chunkSize: number
-}
+import { calculatehash } from './createHash'
 import getFileChunkHash from './getFileChunkHash'
+export interface Iprops {
+    chunkSize?: number
+}
+
 export default class DisposeAllData implements UtilClassInterface {
 
     waitCalculateFiles = [] as Array<IwaitCalculateFiles>
@@ -16,6 +18,7 @@ export default class DisposeAllData implements UtilClassInterface {
     chunkSize: number
     constructor(props: Iprops) {
         this.isCalculating = false
+        // 切片大小默认4M
         this.chunkSize = props.chunkSize ? props.chunkSize : 4 * 1024 * 1024
     }
     /**
@@ -38,16 +41,25 @@ export default class DisposeAllData implements UtilClassInterface {
      */
     private async calculateFilesMessage() {
         this.isCalculating = true
-        console.log(this)
         while (this.waitCalculateFiles.length > 0) {
             let file: any = this.waitCalculateFiles.shift()?.file
             let waituploadFile: IwaitUploadFiles = {
                 file: file,
                 chunkList: getFileChunkList(file, this.chunkSize)
             }
-            let chunks
+            let hash:any = await calculatehash(waituploadFile.chunkList)
+            waituploadFile.chunkList.forEach((item:chunkListsFile, index: number) => {
+                item.hash = `${hash}_${index}`
+            })
+            console.log(`完成文件${<File>file.name}hash计算`)
+            this.addCalculatedFile(waituploadFile)
         }
         this.isCalculating = false
+    }
+
+    private addCalculatedFile(newWaitUploadFile: IwaitUploadFiles) {
+        this.waitUploadFiles.push(newWaitUploadFile)
+        console.log(this.waitUploadFiles)
     }
 
 }

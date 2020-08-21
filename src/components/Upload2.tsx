@@ -1,22 +1,20 @@
 import * as React from 'react'
 import { files, IwaitUploadFiles } from '../interfaces/interfaces'
 import ShowUploadProcess from './ShowUploadProcess'
-import calculateFileHash from '../utils/calculateFileHash'
-import CalculateChunkHash from './CalculateChunkHash'
-class Upload extends React.Component {
+import UploadClass from '../utils/disposeAllData'
+export default class Upload extends React.Component {
 
     readonly state: files = {
         waitUploadFiles: [],
         addFiles: [],
         waitCalculateFiles: [],
-        uploadingFiles: []
+        uploadingFiles: [],
+        uploadedFiles: []
     }
-
+    public uploadClass = new UploadClass({})
     public handleFilechange = (e: any): void => {
         console.log(e.target.files)
-        this.setState({
-            waitCalculateFiles: e.target.files
-        })
+        this.uploadClass.addNewFiles(e.target.files)
     }
     /**
      * updateWaitCalculateFiles  更新带上传文件数组
@@ -27,11 +25,6 @@ class Upload extends React.Component {
      */
     public updateWaitUploadFiles = (waitUploadFile: IwaitUploadFiles): void => {
         let temp = this.state.waitUploadFiles.slice()
-        this.state.uploadingFiles[0].
-        temp.push(waitUploadFile)
-        this.setState({
-            waitUploadFiles: temp
-        })
     }
 
     public completeCalculateChunkHashFiles = (id: string): void => {
@@ -68,5 +61,3 @@ class Upload extends React.Component {
         )
     }
 }
-
-export default Upload
