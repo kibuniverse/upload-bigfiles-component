@@ -1,11 +1,11 @@
 
-import { IwaitUploadFiles } from '../interfaces/interfaces'
+import { IwaitUploadFile } from '../interfaces/interfaces'
 import { getFileChunkList } from './createFilesChunksLists'
 import { calculatehash } from './createHash'
 
 export interface IProps {
     fileList: FileList | []
-    updateWaitUploadFile: (waitFileUploadFile: IwaitUploadFiles) => void
+    updateWaitUploadFile: (waitFileUploadFile: IwaitUploadFile) => void
     chunkSize: number
 }
 

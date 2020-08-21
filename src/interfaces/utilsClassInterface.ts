@@ -1,12 +1,12 @@
 
 
-import { IwaitCalculateFiles, IwaitUploadFiles, IuploadingFile } from './interfaces'
+import { IwaitCalculateFile, IwaitUploadFile, IuploadingFile } from './interfaces'
 // 工具类接口
 export interface UtilClassInterface {
     // 待计算文件数组
-    waitCalculateFiles: Array<IwaitCalculateFiles> | []
+    waitCalculateFiles: Array<IwaitCalculateFile> | []
     // 待上传文件数组
-    waitUploadFiles: Array<IwaitUploadFiles> | []
+    waitUploadFiles: Array<IwaitUploadFile> | []
     // 正在上传文件数组
     uploadingFiles: Array<IuploadingFile> | []
 

@@ -3,7 +3,6 @@ export interface chunkListsFile {
     file: Blob
     hash: string
     fileName: string
-    ishashCalculateComplete?: boolean
 }
 
 export function getFilesChunkLists(files: Array<File>, chunkSize: number) {
@@ -17,7 +16,6 @@ export function getFilesChunkLists(files: Array<File>, chunkSize: number) {
                 file: files.slice(cur, cur + chunkSize),
                 hash: `${files.name}_${index}`,
                 fileName: files.name,
-                ishashCalculateComplete: false
             })
             index++;
             cur += chunkSize;
@@ -30,7 +28,7 @@ export function getFilesChunkLists(files: Array<File>, chunkSize: number) {
     return fileChunkLists
 }
 
-export function getFileChunkList(files: File, chunkSize: number) {
+export function getFileChunkList(files: File, chunkSize: number): Array<chunkListsFile> {
     let fileChunkList: Array<chunkListsFile> = []
     let cur = 0
     let index = 1

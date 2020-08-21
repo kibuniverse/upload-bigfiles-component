@@ -1,5 +1,5 @@
 import React from 'react';
-import Upload from './components/Upload2'
+import Upload from './components/Main'
 function App() {
   return (
     <Upload />

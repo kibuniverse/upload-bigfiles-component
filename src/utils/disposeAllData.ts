@@ -1,25 +1,28 @@
-
-
 import { UtilClassInterface } from '../interfaces/utilsClassInterface'
-import { IwaitCalculateFiles, IwaitUploadFiles, IuploadingFile, chunkListsFile } from '../interfaces/interfaces'
+import { IwaitCalculateFile, IwaitUploadFile, IuploadingFile, chunkListsFile } from '../interfaces/interfaces'
 import getFileChunkList from './getFileChunkHash'
 import { calculatehash } from './createHash'
-import getFileChunkHash from './getFileChunkHash'
+
 export interface Iprops {
     chunkSize?: number
+    addNewWaitCalculateFile: (files: Array<IwaitCalculateFile>) => void
+    addNewWaitUploadFile: (file: IwaitUploadFile) => void
 }
 
 export default class DisposeAllData implements UtilClassInterface {
-
-    waitCalculateFiles = [] as Array<IwaitCalculateFiles>
-    waitUploadFiles = [] as Array<IwaitUploadFiles>
+    waitCalculateFiles = [] as Array<IwaitCalculateFile>
+    waitUploadFiles = [] as Array<IwaitUploadFile>
     uploadingFiles = [] as Array<IuploadingFile>
+    addNewWaitCalculateFile: (files: Array<IwaitCalculateFile>) => void
+    addNewWaitUploadFile: (file: IwaitUploadFile) => void
     isCalculating: boolean
     chunkSize: number
     constructor(props: Iprops) {
         this.isCalculating = false
         // 切片大小默认4M
         this.chunkSize = props.chunkSize ? props.chunkSize : 4 * 1024 * 1024
+        this.addNewWaitCalculateFile = props.addNewWaitCalculateFile
+        this.addNewWaitUploadFile = props.addNewWaitUploadFile
     }
     /**
      * 
@@ -32,6 +35,7 @@ export default class DisposeAllData implements UtilClassInterface {
                 file: newFiles[i],
             })
         }
+        this.addNewWaitCalculateFile(this.waitCalculateFiles)
         if (!this.isCalculating) {
             this.calculateFilesMessage()
         }
@@ -43,12 +47,12 @@ export default class DisposeAllData implements UtilClassInterface {
         this.isCalculating = true
         while (this.waitCalculateFiles.length > 0) {
             let file: any = this.waitCalculateFiles.shift()?.file
-            let waituploadFile: IwaitUploadFiles = {
+            let waituploadFile: IwaitUploadFile = {
                 file: file,
                 chunkList: getFileChunkList(file, this.chunkSize)
             }
-            let hash:any = await calculatehash(waituploadFile.chunkList)
-            waituploadFile.chunkList.forEach((item:chunkListsFile, index: number) => {
+            let hash: any = await calculatehash(waituploadFile.chunkList)
+            waituploadFile.chunkList.forEach((item: chunkListsFile, index: number) => {
                 item.hash = `${hash}_${index}`
             })
             console.log(`完成文件${<File>file.name}hash计算`)
@@ -57,9 +61,8 @@ export default class DisposeAllData implements UtilClassInterface {
         this.isCalculating = false
     }
 
-    private addCalculatedFile(newWaitUploadFile: IwaitUploadFiles) {
+    private addCalculatedFile(newWaitUploadFile: IwaitUploadFile) {
         this.waitUploadFiles.push(newWaitUploadFile)
-        console.log(this.waitUploadFiles)
     }
 
 }

@@ -1,27 +1,31 @@
-export interface files {
-    waitUploadFiles: Array<IwaitUploadFiles> | []
-    addFiles: FileList | []
-    waitCalculateFiles: Array<IwaitCalculateFiles> | []
+export interface IfilesStatus {
+    waitUploadFiles: Array<IwaitUploadFile> | []
+    waitCalculateFiles: Array<IwaitCalculateFile> | []
     uploadingFiles: Array<IuploadingFile> | []
     uploadedFiles: Array<IuploadedFile> | []
 }
 
-export interface IwaitUploadFiles extends IcalculatedBasic {
-    file: File
+export interface chunkListsFile {
+    file: Blob
     hash: string
-}
-
-export interface IwaitCalculateFiles {
-    id: string
-    file: File
-    isCalculate: boolean
+    fileName: string
 }
 
 export interface IcalculatedBasic {
-    chunkList: Array<File> | []
+    chunkList: Array<chunkListsFile> | []
 }
 
-export interface IuploadingFile extends IwaitCalculateFiles, IcalculatedBasic {
+export interface IwaitUploadFile extends IcalculatedBasic {
+    file: File
+    hash?: string
+}
+
+export interface IwaitCalculateFile {
+    id: string
+    file: File
+}
+
+export interface IuploadingFile extends IwaitCalculateFile, IcalculatedBasic {
     uploadProcess: number
 }
 
