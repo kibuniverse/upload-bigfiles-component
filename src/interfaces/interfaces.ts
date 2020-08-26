@@ -9,6 +9,7 @@ export interface chunkListsFile {
     file: Blob
     hash: string
     fileName: string
+    index?: number
 }
 
 export interface IcalculatedBasic {
@@ -16,8 +17,10 @@ export interface IcalculatedBasic {
 }
 
 export interface IwaitUploadFile extends IcalculatedBasic {
+    id?: string
     file: File
     hash?: string
+    uploadProcess?: number
 }
 
 export interface IwaitCalculateFile {

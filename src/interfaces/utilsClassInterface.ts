@@ -9,9 +9,13 @@ export interface UtilClassInterface {
     waitUploadFiles: Array<IwaitUploadFile> | []
     // 正在上传文件数组
     uploadingFiles: Array<IuploadingFile> | []
-
+    updateWaitCalculateFile: (files: Array<IwaitCalculateFile>) => void
+    updateWaitUploadFile: (files: Array<IwaitUploadFile>) => void
+    isCalculating: boolean
+    chunkSize: number
     // 添加待计算文件
     addNewFiles: (newFiles: FileList) => void
 
     // 
+
 }
