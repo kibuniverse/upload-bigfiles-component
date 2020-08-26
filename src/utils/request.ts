@@ -1,5 +1,5 @@
 
-interface para {
+interface Ipara {
     url: string
     updateUploadProcess: (index: number) => void
     index: number
@@ -10,7 +10,7 @@ interface para {
 }
 
 
-export default function requset(paramsObj: para) {
+export default function requset(paramsObj: Ipara) {
     const url = paramsObj.url
     const data = paramsObj.data || null
     const method = paramsObj.method || 'post'
