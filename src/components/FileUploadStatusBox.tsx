@@ -1,5 +1,6 @@
 import React from 'react'
 import { IwaitUploadFile } from '../interfaces/interfaces'
+import UploadProcess from './UploadProcessBar'
 
 interface Iprops {
     waitUploadFile: IwaitUploadFile
@@ -7,10 +8,21 @@ interface Iprops {
 
 function FileUploadBox(props: Iprops) {
     return (
-        <div>
-            {props.waitUploadFile.file.name}
-        </div>
+        <>
+            <div style={{
+                float: 'left',
+                fontSize: '15px'
+            }}>
+                {props.waitUploadFile.file.name}
+            </div>
+            <div style={{ content: '', display: 'block', clear: 'both'}}></div>
+            <div>
+                <UploadProcess 
+                    uploadProcess={props.waitUploadFile.uploadProcess as number}
+                />
+            </div>
+        </>
     )
-}   
+}
 
 export default FileUploadBox
