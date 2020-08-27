@@ -27,6 +27,8 @@ export default class Upload extends React.Component {
     public updateWaitCalculateFile(files: Array<IwaitCalculateFile>): void {
         this.setState({
             waitCalculateFiles: files
+        }, () => {
+            console.log(this.state.waitCalculateFiles)
         })
     }
     /**
