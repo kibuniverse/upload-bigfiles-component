@@ -1,9 +1,11 @@
 import * as React from 'react'
-import { IfilesStatus, IwaitUploadFile, IwaitCalculateFile } from '../interfaces/interfaces'
+import { IfilesStatus, IwaitUploadFile, IwaitCalculateFile, IuploadedFile } from '../interfaces/interfaces'
 import UploadClass from '../utils/disposeAllData'
 import WaitCalculateFiles from './WaitCalculate'
 import AddFileBox from './AddFileBox'
 import WaitUploadFiles from './WaitUploadFiles'
+import uploadedFiles from './UploadedFiles'
+import UploadedFiles from './UploadedFiles'
 export default class Upload extends React.Component {
 
     readonly state: IfilesStatus = {
@@ -16,7 +18,8 @@ export default class Upload extends React.Component {
     public uploadClass = new UploadClass({
         chunkSize: 4 * 1024 * 1024,
         updateWaitCalculateFile: this.updateWaitCalculateFile.bind(this),
-        updateWaitUploadFile: this.updateWaitUploadFile.bind(this)
+        updateWaitUploadFile: this.updateWaitUploadFile.bind(this),
+        updateUploadedFiles: this.updateUploadedFiles.bind(this)
     })
 
     /**
@@ -49,6 +52,12 @@ export default class Upload extends React.Component {
         this.uploadClass.addNewFiles(e.target.files)
     }
 
+    public updateUploadedFiles(files: Array<IuploadedFile>): void {
+        this.setState({
+            uploadedFiles: files
+        })
+    }
+
     render() {
         return (
             <>
@@ -60,6 +69,9 @@ export default class Upload extends React.Component {
                 />
                 <WaitUploadFiles 
                     waitUploadFiles={this.state.waitUploadFiles}
+                />
+                <UploadedFiles 
+                    uploadedFiles={this.state.uploadedFiles}
                 />
             </>
         )
