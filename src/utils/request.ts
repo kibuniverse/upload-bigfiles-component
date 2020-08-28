@@ -1,7 +1,6 @@
 
 interface Ipara {
     url: string
-    updateUploadProcess: (index: number) => void
     index: number
     method?: string | undefined
     data?: any
@@ -25,11 +24,6 @@ export default function requset(paramsObj: Ipara) {
         xhr.onreadystatechange = () => {
             if (xhr.readyState === 4) {
                 if ((xhr.status >= 200 && xhr.status <= 300) || xhr.status === 304) {
-                    if (requestList) {
-                        const completeXhrIndex = requestList.indexOf(xhr)
-                        requestList.splice(completeXhrIndex, 1)
-                        paramsObj.updateUploadProcess(paramsObj.index)
-                    }
                     resolve({
                         data: xhr.responseText
                     })
