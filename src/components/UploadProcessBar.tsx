@@ -1,12 +1,13 @@
 import React from 'react'
+
 interface Iprops {
     uploadProcess: number
 }
 
-
 const UploadProcess = (props: Iprops) => {
     let process = props.uploadProcess
-    while(process > 1) {
+    // 考虑计算的偏差
+    while(process >= 1.1) {
         process = process / 10
     }
     return (
