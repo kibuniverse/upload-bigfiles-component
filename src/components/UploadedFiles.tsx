@@ -13,7 +13,7 @@ const UploadedFiles = (props: Iprops) => {
             marginBottom: '10px'
         }}>
             <div>{item.fileName}</div>
-            <a>{item.url}</a>
+            <a href={item.url}>{item.url}</a>
         </li>
     ))
     return (

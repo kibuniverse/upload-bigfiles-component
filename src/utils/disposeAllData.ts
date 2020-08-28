@@ -8,6 +8,8 @@ import servicePath from './Apiurl'
 import getExtendName from './getExtendName'
 import getUploadingFileIndexById from './getUploadingFileIndexById'
 import calculateUploadProcess from './calculateUploadProcess'
+import UploadFile from './uploadFile'
+import { wait } from '@testing-library/react'
 
 export interface Iprops {
     chunkSize?: number
@@ -101,19 +103,60 @@ export default class DisposeAllData implements UtilClassInterface {
     }
 
     /**
-     * @function 增加计算完成文件并上报 开启上传
+     * @function 增加计算完成文件并上报 调用上传方法
      * @param newWaitUploadFile 计算hash完成的文件
      */
     private async addCalculatedFile(newWaitUploadFile: IwaitUploadFile): Promise<any> {
         this.waitUploadFiles.push(newWaitUploadFile)
         this.updateWaitUploadFile(this.waitUploadFiles)
-        uploadFile(newWaitUploadFile, 3, this.updateUploadFilePercent.bind(this)).then(async res => {
-            let uploadedMessage: any = await this.mergeRequest(newWaitUploadFile)
-            let index: number = getUploadingFileIndexById(newWaitUploadFile.id as string, this.waitUploadFiles)
-            this.waitUploadFiles.splice(index, index + 1)
-            this.updateWaitUploadFile(this.waitUploadFiles)
-            let url: string = JSON.parse(uploadedMessage.data).url
-            this.addUploadedFiles(newWaitUploadFile.file.name, url)
+        // 上传文件
+        this.upload(newWaitUploadFile)
+    }
+
+    /**
+     * @function 执行验证以及上传逻辑 
+     * @param waitUploadFile 待上传文件
+     */
+    private async upload(waitUploadFile: IwaitUploadFile) {
+        let verifyData: any = await this.verifyRequest(waitUploadFile.file.name, waitUploadFile.hash as string)
+        verifyData = JSON.parse(verifyData.data)
+        console.log(verifyData)
+        // 文件已经上传完成
+        if (verifyData.status === 1) {
+            this.completeFileUpload(waitUploadFile.id as string, waitUploadFile.file.name, verifyData.url as string)
+            return
+        }
+        uploadFile(waitUploadFile, 3, this.updateUploadFilePercent.bind(this)).then(async res => {
+            let uploadedMessage: any = await this.mergeRequest(waitUploadFile)
+            uploadedMessage = JSON.parse(uploadedMessage.data)
+            this.completeFileUpload(waitUploadFile.id as string, waitUploadFile.file.name, uploadedMessage.url as string)
+        })
+    }
+    
+    /**
+     * @function 处理上传完成后的逻辑，上报更新UI
+     * @param id 文件的id
+     * @param fileName 文件名
+     * @param url 得到的url
+     */
+    private completeFileUpload(id: string, fileName: string, url: string) {
+        let index: number = getUploadingFileIndexById(id, this.waitUploadFiles)
+        this.waitUploadFiles.splice(index, index + 1)
+        this.updateWaitUploadFile(this.waitUploadFiles)
+        this.addUploadedFiles(fileName, url)
+    }
+
+    private verifyRequest(fileName: string, filehash: string) {
+        return request({
+            method: 'post',
+            url: servicePath.verify,
+            headers: {
+                'content-type': 'application/json'
+            },
+            data: JSON.stringify({
+                fileName: fileName,
+                fileHash: filehash
+            }),
         })
     }
 
@@ -125,8 +168,6 @@ export default class DisposeAllData implements UtilClassInterface {
      * @function 更新上传进度
      */
     private updateUploadFilePercent(id: string, e: any, index: number): void {
-        console.log(id, e.loaded, index)
-
         let fileIndex: number = getUploadingFileIndexById(id, this.waitUploadFiles)
         console.log(this.waitUploadFiles[fileIndex])
         if (fileIndex === -1) { return }
@@ -145,7 +186,6 @@ export default class DisposeAllData implements UtilClassInterface {
         return request({
             method: 'post',
             url: servicePath.mergeRequest,
-            index: 0,
             headers: {
                 "content-type": "application/json"
             },

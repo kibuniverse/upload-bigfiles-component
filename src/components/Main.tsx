@@ -4,7 +4,6 @@ import UploadClass from '../utils/disposeAllData'
 import WaitCalculateFiles from './WaitCalculate'
 import AddFileBox from './AddFileBox'
 import WaitUploadFiles from './WaitUploadFiles'
-import uploadedFiles from './UploadedFiles'
 import UploadedFiles from './UploadedFiles'
 export default class Upload extends React.Component {
 
