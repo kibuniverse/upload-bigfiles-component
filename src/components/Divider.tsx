@@ -26,7 +26,7 @@ const Divider: React.FC<Iprops> = props => {
             <div style={{
                 margin: `0 ${margin}`,
                 color: color,
-            }}>{props.text}</div>
+            }}>{text}</div>
             <span style={{
                 flexGrow: 1,
                 borderBottom: `1px solid ${lineColor}`,
