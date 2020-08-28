@@ -19,20 +19,18 @@ const Divider: React.FC<Iprops> = props => {
             display: 'flex',
             alignItems: 'center',
         }}>
-            <div style={{
+            <span style={{
                 flexGrow: 1,
                 borderBottom: `1px solid ${lineColor}`,
-                
-            }}></div>
+            }}></span>
             <div style={{
                 margin: `0 ${margin}`,
                 color: color,
             }}>{props.text}</div>
-            <div style={{
+            <span style={{
                 flexGrow: 1,
                 borderBottom: `1px solid ${lineColor}`,
-                
-            }}></div>
+            }}></span>
             
         </div>
     )
