@@ -100,6 +100,10 @@ export default class DisposeAllData implements UtilClassInterface {
         this.updateUploadedFiles(this.uploadedFiles)
     }
 
+    /**
+     * @function 增加计算完成文件并上报 开启上传
+     * @param newWaitUploadFile 计算hash完成的文件
+     */
     private async addCalculatedFile(newWaitUploadFile: IwaitUploadFile): Promise<any> {
         this.waitUploadFiles.push(newWaitUploadFile)
         this.updateWaitUploadFile(this.waitUploadFiles)
