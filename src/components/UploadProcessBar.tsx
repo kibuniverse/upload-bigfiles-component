@@ -12,13 +12,13 @@ const UploadProcess = (props: Iprops) => {
     return (
         <div style={{
             width: '100%',
-            height: '4px',
+            height: '5px',
             backgroundColor: '#c9c9c9',
-            borderRadius: '2px',
+            borderRadius: '4px',
         }}>
             <div style={{
                 width: `${process * 100}%`,
-                height: '4px',
+                height: '5px',
                 backgroundImage: 'linear-gradient(to right, #8ebeb9, #3bc9d7, #37b9e9)',
                 transition: 'all .5s'
             }}>
