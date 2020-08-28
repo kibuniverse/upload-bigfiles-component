@@ -1,7 +1,5 @@
 import { IwaitUploadFile, chunkListsFile } from "../interfaces/interfaces";
-import request from './request'
 import servicePath from './Apiurl'
-import { count } from "console";
 
 /**
  * @param file 待上传文件
@@ -12,7 +10,7 @@ import { count } from "console";
 
 
 
-export default async function UploadFile(file: IwaitUploadFile, concurrency: number, updatePercent: (e: any) => void) {
+export default async function UploadFile(file: IwaitUploadFile, concurrency: number, updatePercent: (id: string, e: any, index: number) => void) {
     return new Promise((reslove, reject) => {
         let chunkList: Array<chunkListsFile> = file.chunkList
         let len = chunkList.length
@@ -25,9 +23,11 @@ export default async function UploadFile(file: IwaitUploadFile, concurrency: num
             const item: chunkListsFile = chunkList.shift() as chunkListsFile
             if (item) {
                 const formdata = new FormData()
-                formdata.append(item.hash, item.file)
+                formdata.append('fileData', item.file)
+                formdata.append('fileName', item.fileName)
+                formdata.append('hash', item.hash)
                 const xhr = new XMLHttpRequest()
-                const index = item.index
+                const index:number = item.index as number
 
                 xhr.onerror = function error(e) {
                     isStop = true
@@ -37,7 +37,7 @@ export default async function UploadFile(file: IwaitUploadFile, concurrency: num
                 // 分片上传完后的回调
                 xhr.onload = () => {
                     if (xhr.status < 200 || xhr.status >= 300) {
-                        isStop = false
+                        isStop = true
                         reject('服务端返回状态码错误')
                     }
                     // 最后一个切片已经上传完成
@@ -56,10 +56,9 @@ export default async function UploadFile(file: IwaitUploadFile, concurrency: num
                         if (e.total > 0) {
                             e.percent = e.loaded / e.total * 100
                         }
-                        console.log(e.loaded)
+                        updatePercent(file.id as string, e, index)
                     }
                 }
-
                 xhr.open('post', servicePath.sendChunkRequest, true)
                 xhr.send(formdata)
             }
@@ -67,7 +66,8 @@ export default async function UploadFile(file: IwaitUploadFile, concurrency: num
         while (concurrency > 0) {
             setTimeout(() => {
                 start()
-            }, Math.random() * 1000)
+            }, Math.random() * 100)
+            concurrency--
         }
     })
 }
