@@ -22,6 +22,7 @@ export interface IwaitUploadFile extends IcalculatedBasic {
     hash?: string
     uploadProcess?: number
     uploadPercentArr: Array<number> | []
+    uploadedSize: number
 }
 
 export interface IwaitCalculateFile {
