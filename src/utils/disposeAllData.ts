@@ -60,6 +60,7 @@ export default class DisposeAllData implements UtilClassInterface {
      * @function 获取文件切片以及hash
      */
     private async calculateFilesMessage() {
+        console.log(this.waitCalculateFiles.length)
         while (this.waitCalculateFiles.length > 0) {
             let file: any = this.waitCalculateFiles[0].file
             let waituploadFile: IwaitUploadFile = {
@@ -71,7 +72,7 @@ export default class DisposeAllData implements UtilClassInterface {
                 uploadedSize: 0,
             }
             let hash: any = await calculatehash(waituploadFile.chunkList)
-
+            console.log(hash)
             // hash计算完成，更新待计算文件数组
             this.waitCalculateFiles.shift()
             waituploadFile.chunkList.forEach((item: chunkListsFile, index: number) => {
@@ -82,6 +83,7 @@ export default class DisposeAllData implements UtilClassInterface {
 
             // 初始化上传进度数组
             waituploadFile.uploadPercentArr = new Array(waituploadFile.chunkList.length).fill(0)
+            console.log(waituploadFile)
             waituploadFile.hash = hash
             // 更新计算完成文件数组
             this.addCalculatedFile(waituploadFile)
@@ -123,7 +125,9 @@ export default class DisposeAllData implements UtilClassInterface {
     private async upload(waitUploadFile: IwaitUploadFile) {
         let verifyData: any = await this.verifyRequest(waitUploadFile.file.name, waitUploadFile.hash as string)
         verifyData = JSON.parse(verifyData.data)
+
         console.log(verifyData)
+
         // 文件已经上传完成
         if (verifyData.status === 1) {
             this.completeFileUpload(waitUploadFile.id as string, waitUploadFile.file.name, verifyData.url as string)
@@ -133,9 +137,11 @@ export default class DisposeAllData implements UtilClassInterface {
         if(verifyData.AlreadyUploadList) {
             let loaded = this.calculeateAlreadyUploadSize(verifyData.AlreadyUploadList, waitUploadFile)
             let index = getUploadingFileIndexById(waitUploadFile.id as string, this.waitUploadFiles)
+            if(index === -1) {
+                return
+            }
             this.waitUploadFiles[index].uploadedSize = loaded
             // 过滤已上传切片
-            console.log(this.waitUploadFiles[index].uploadedSize)
             this.waitUploadFiles[index].chunkList = this.waitUploadFiles[index].chunkList.filter((item: chunkListsFile) => (
                 verifyData.AlreadyUploadList.indexOf(item.hash) === -1
             ))
@@ -216,7 +222,7 @@ export default class DisposeAllData implements UtilClassInterface {
                 "content-type": "application/json"
             },
             data: JSON.stringify({
-                filename: uploadFile.file.name,
+                fileName: uploadFile.hash,
                 newname: `${uploadFile.hash}.${getExtendName(uploadFile.file.name)}`,
                 size: uploadFile.file.size,
                 chunkSize: this.chunkSize
