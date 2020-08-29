@@ -10,6 +10,7 @@ import getUploadingFileIndexById from './getUploadingFileIndexById'
 import calculateUploadProcess from './calculateUploadProcess'
 import UploadFile from './uploadFile'
 import { wait } from '@testing-library/react'
+import { throws } from 'assert'
 
 export interface Iprops {
     chunkSize?: number
@@ -65,22 +66,24 @@ export default class DisposeAllData implements UtilClassInterface {
                 id: `${file.name as File}_${new Date().getTime()}`,
                 file: file,
                 chunkList: getFileChunkList(file, this.chunkSize),
-                uploadProcess: 50,
-                uploadPercentArr: []
+                uploadProcess: 0,
+                uploadPercentArr: [],
+                uploadedSize: 0,
             }
             let hash: any = await calculatehash(waituploadFile.chunkList)
+
+            // hash计算完成，更新待计算文件数组
             this.waitCalculateFiles.shift()
             waituploadFile.chunkList.forEach((item: chunkListsFile, index: number) => {
                 item.hash = `${hash}_${index}`
                 item.index = index
+                item.fileName = hash
             })
 
             // 初始化上传进度数组
             waituploadFile.uploadPercentArr = new Array(waituploadFile.chunkList.length).fill(0)
             waituploadFile.hash = hash
-            console.log(`完成文件${file.name}hash计算`)
             // 更新计算完成文件数组
-            console.log(`开始上传${file.name}文件`)
             this.addCalculatedFile(waituploadFile)
             // 上报新的待计算文件数组
             this.updateWaitCalculateFile(this.waitCalculateFiles)
@@ -126,6 +129,17 @@ export default class DisposeAllData implements UtilClassInterface {
             this.completeFileUpload(waitUploadFile.id as string, waitUploadFile.file.name, verifyData.url as string)
             return
         }
+        // 处理断点续传逻辑
+        if(verifyData.AlreadyUploadList) {
+            let loaded = this.calculeateAlreadyUploadSize(verifyData.AlreadyUploadList, waitUploadFile)
+            let index = getUploadingFileIndexById(waitUploadFile.id as string, this.waitUploadFiles)
+            this.waitUploadFiles[index].uploadedSize = loaded
+            // 过滤已上传切片
+            console.log(this.waitUploadFiles[index].uploadedSize)
+            this.waitUploadFiles[index].chunkList = this.waitUploadFiles[index].chunkList.filter((item: chunkListsFile) => (
+                verifyData.AlreadyUploadList.indexOf(item.hash) === -1
+            ))
+        }
         uploadFile(waitUploadFile, 3, this.updateUploadFilePercent.bind(this)).then(async res => {
             let uploadedMessage: any = await this.mergeRequest(waitUploadFile)
             uploadedMessage = JSON.parse(uploadedMessage.data)
@@ -133,6 +147,20 @@ export default class DisposeAllData implements UtilClassInterface {
         })
     }
     
+    /**
+     * @function 计算已上传的size
+     * @param AlreadyUploadList 服务端返回的已上传hash列表
+     * @param waitUploadFile 待上传文件
+     */
+    private calculeateAlreadyUploadSize(AlreadyUploadList: Array<any>, waitUploadFile: IwaitUploadFile) {
+        let loaded:number = 0
+        for(let i = 0, len = AlreadyUploadList.length; i < len; i ++) {
+            let index = AlreadyUploadList[i].slice(-1)
+            loaded += waitUploadFile.chunkList[index].file.size
+        }
+        return loaded
+    }
+
     /**
      * @function 处理上传完成后的逻辑，上报更新UI
      * @param id 文件的id
@@ -169,11 +197,9 @@ export default class DisposeAllData implements UtilClassInterface {
      */
     private updateUploadFilePercent(id: string, e: any, index: number): void {
         let fileIndex: number = getUploadingFileIndexById(id, this.waitUploadFiles)
-        console.log(this.waitUploadFiles[fileIndex])
         if (fileIndex === -1) { return }
         this.waitUploadFiles[fileIndex].uploadPercentArr[index] = e.loaded
-        console.log(this.waitUploadFiles[fileIndex])
-        this.waitUploadFiles[fileIndex].uploadProcess = calculateUploadProcess(this.waitUploadFiles[fileIndex])
+        this.waitUploadFiles[fileIndex].uploadProcess = calculateUploadProcess(this.waitUploadFiles[fileIndex].uploadedSize, this.waitUploadFiles[fileIndex])
         this.updateWaitUploadFile(this.waitUploadFiles)
     }
 
@@ -198,3 +224,4 @@ export default class DisposeAllData implements UtilClassInterface {
         })
     }
 }
+
