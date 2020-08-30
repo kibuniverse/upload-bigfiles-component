@@ -26,6 +26,7 @@ const UploadedFiles = (props: Iprops) => {
             borderTop: '1px solid green',
             backgroundColor: '#fff',
             marginTop: '20px',
+            display: `${props.uploadedFiles.length > 0 ? 'block': 'none'}`
         }}>
             <Divider
                 text='已上传文件'

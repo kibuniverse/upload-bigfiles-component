@@ -25,6 +25,8 @@ export default function WaitUploadFiles(props: Iprops) {
             border: '1px solid #5099ed',
             backgroundColor: '#fff',
             marginTop: '20px',
+            transition: 'all 1s',
+            display: `${props.waitUploadFiles.length > 0 ? 'block': 'none'}`
         }}>
             <ul style={{
                 padding: '0px',

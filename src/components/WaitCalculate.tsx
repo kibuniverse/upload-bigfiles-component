@@ -22,6 +22,7 @@ const WaitCalculateFiles = (props: Iprops) => {
             padding: '10px',
             border: '1px solid #5099ed',
             backgroundColor: '#b8d7fb',
+            display: `${props.files.length > 0 ? 'block': 'none'}`
         }}>
             <p>正在计算以下文件哈希，请稍等</p>
             <ul style={{
