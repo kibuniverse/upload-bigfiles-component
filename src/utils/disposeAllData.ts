@@ -8,9 +8,7 @@ import servicePath from './Apiurl'
 import getExtendName from './getExtendName'
 import getUploadingFileIndexById from './getUploadingFileIndexById'
 import calculateUploadProcess from './calculateUploadProcess'
-import UploadFile from './uploadFile'
-import { wait } from '@testing-library/react'
-import { throws } from 'assert'
+
 
 export interface Iprops {
     chunkSize?: number
