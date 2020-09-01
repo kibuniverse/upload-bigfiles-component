@@ -1,4 +1,4 @@
-let ipUrl = 'http://127.0.0.1:8001/'
+let ipUrl = 'http://49.234.79.241:8001/'
 
 let servicePath = {
     sendChunkRequest: ipUrl + 'file_upload',
