@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { IfilesStatus, IwaitUploadFile, IwaitCalculateFile, IuploadedFile } from '../interfaces/interfaces'
-import UploadClass from '../utils/disposeAllData'
+import UploadClass from '../disposeAllData'
 import WaitCalculateFiles from './WaitCalculate'
 import AddFileBox from './AddFileBox'
 import WaitUploadFiles from './WaitUploadFiles'
