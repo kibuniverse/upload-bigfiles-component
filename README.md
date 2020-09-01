@@ -36,9 +36,14 @@ npm run start
 
 
 
-## 接口
+### 接口
 
+[link to](https://github.com/kibuniverse/upload-bigfiles-component/blob/v2.0/src/interfaces/interfaces.ts )
 
+- fileBasicMessage:  文件基本信息接口
+- IwaitUploadFile  继承fileBasicMessage:  待上传文件接口
+- IwaitCalculateFile： 待计算文件接口
+- IuploadedFile: 计算完成文件接口
 
 
 
