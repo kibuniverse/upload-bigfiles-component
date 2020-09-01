@@ -12,6 +12,7 @@ import calculateUploadProcess from './utils/calculateUploadProcess'
 
 export interface Iprops {
     chunkSize?: number
+    concurrency: number
     updateWaitCalculateFile: (files: Array<IwaitCalculateFile>) => void
     updateWaitUploadFile: (files: Array<IwaitUploadFile>) => void
     updateUploadedFiles: (files: Array<IuploadedFile>) => void
@@ -28,11 +29,12 @@ export default class DisposeAllData implements UtilClassInterface {
     isCalculating: boolean
     chunkSize: number
     chunksConcurrenceUploadNum: number
-
+    concurrency: number
     constructor(props: Iprops) {
         this.isCalculating = false
         // 切片大小默认4M
         this.chunkSize = props.chunkSize ? props.chunkSize : 4 * 1024 * 1024
+        this.concurrency = props.concurrency ? props.concurrency : 3
         this.updateWaitCalculateFile = props.updateWaitCalculateFile
         this.updateWaitUploadFile = props.updateWaitUploadFile
         this.updateUploadedFiles = props.updateUploadedFiles
@@ -144,7 +146,7 @@ export default class DisposeAllData implements UtilClassInterface {
                 verifyData.AlreadyUploadList.indexOf(item.hash) === -1
             ))
         }
-        uploadFile(waitUploadFile, 3, this.updateUploadFilePercent.bind(this)).then(async res => {
+        uploadFile(waitUploadFile, this.concurrency, this.updateUploadFilePercent.bind(this)).then(async res => {
             let uploadedMessage: any = await this.mergeRequest(waitUploadFile)
             uploadedMessage = JSON.parse(uploadedMessage.data)
             this.completeFileUpload(waitUploadFile.id as string, waitUploadFile.file.name, uploadedMessage.url as string)
