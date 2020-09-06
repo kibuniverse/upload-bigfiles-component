@@ -35,7 +35,6 @@ npm run start
 此版本将具体的文件处理上传逻辑从组建中抽离了出来做成了一个上传工具类`disposeAllData.ts`， 所有的组件只负责渲染处理完成后的数据
 
 
-
 ### 接口
 
 [link to](https://github.com/kibuniverse/upload-bigfiles-component/blob/v2.0/src/interfaces/interfaces.ts )
@@ -87,7 +86,8 @@ npm run start
 
 ##### 文件切片
 
-利用文件的Blob类型原生方法slice，更具切片大小进行循环切片
+利用文件的Blob类型原生方法slice，根据切片大小进行循环切片
+
 
 
 
@@ -111,6 +111,32 @@ while (concurrency > 0) {
 
 
 ##### 计算文件上传进度
+
+> 大体思路为利用上传xhr对象的onload属性计算出每一个分片的进度从而算出整体的进度
+
+###### 待上传文件接口
+
+```tsx
+interface fileBasicMessage {
+    file: File,
+    id?: string
+}
+export interface IwaitUploadFile extends fileBasicMessage {
+    hash?: string  //文件hash
+    uploadProcess?: number //上传文件的进度 计算后得出
+    uploadPercentArr: Array<number>  // 用于记录上传列表返回的已上传文件大小
+    chunkList: Array<chunkListsFile> | []  // 上传文件列表
+    uploadedSize: number  // 记录服务端返回的已上传文件大小
+}
+```
+
+
+
+1. 首先利用服务端返回的已上传文件列表名计算出已上传的文件大小并作为当前待上传对象的`uploadedSize`属性
+2. 在上传单个切片的时候注入回调函数上报当前切片的进度，修改对应的上传列表的值后累加上传列表和`uploadSize`值后计算出已上传的进度
+3. 调用更新函数，上报后更新UI
+
+
 
 
 
