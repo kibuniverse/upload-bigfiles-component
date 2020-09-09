@@ -10,12 +10,12 @@ export default class Upload extends React.Component {
     readonly state: IfilesStatus = {
         waitUploadFiles: [],
         waitCalculateFiles: [],
-        uploadingFiles: [],
         uploadedFiles: []
     }
     // 上传工具类
     public uploadClass = new UploadClass({
         chunkSize: 4 * 1024 * 1024,
+        concurrency: 4,
         updateWaitCalculateFile: this.updateWaitCalculateFile.bind(this),
         updateWaitUploadFile: this.updateWaitUploadFile.bind(this),
         updateUploadedFiles: this.updateUploadedFiles.bind(this)

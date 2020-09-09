@@ -1,5 +1,5 @@
 import { UtilClassInterface } from './interfaces/utilsClassInterface'
-import { IwaitCalculateFile, IwaitUploadFile, IuploadingFile, chunkListsFile, IuploadedFile } from './interfaces/interfaces'
+import { IwaitCalculateFile, IwaitUploadFile, chunkListsFile, IuploadedFile } from './interfaces/interfaces'
 import getFileChunkList from './utils/getFileChunkHash'
 import { calculatehash } from './utils/createHash'
 import uploadFile from './utils/uploadFile'
@@ -21,7 +21,6 @@ export interface Iprops {
 export default class DisposeAllData implements UtilClassInterface {
     waitCalculateFiles = [] as Array<IwaitCalculateFile>
     waitUploadFiles = [] as Array<IwaitUploadFile>
-    uploadingFiles = [] as Array<IuploadingFile>
     uploadedFiles = [] as Array<IuploadedFile>
     updateWaitCalculateFile: (files: Array<IwaitCalculateFile>) => void
     updateWaitUploadFile: (files: Array<IwaitUploadFile>) => void
