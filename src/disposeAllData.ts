@@ -51,7 +51,9 @@ export default class DisposeAllData implements UtilClassInterface {
                 file: newFiles[i],
             })
         }
+        
         this.updateWaitCalculateFile(this.waitCalculateFiles)
+        // 开始计算已添加的文件的hash
         this.calculateFilesMessage()
     }
 
@@ -59,18 +61,18 @@ export default class DisposeAllData implements UtilClassInterface {
      * @function 获取文件切片以及hash
      */
     private async calculateFilesMessage() {
-        console.log(this.waitCalculateFiles.length)
         while (this.waitCalculateFiles.length > 0) {
             let file: any = this.waitCalculateFiles[0].file
             let waituploadFile: IwaitUploadFile = {
-                id: `${file.name as File}_${new Date().getTime()}`,
+                id: `${file.name as String}_${new Date().getTime()}`,
                 file: file,
                 chunkList: getFileChunkList(file, this.chunkSize),
                 uploadProcess: 0,
                 uploadPercentArr: [],
                 uploadedSize: 0,
             }
-            let hash: any = await calculatehash(waituploadFile.chunkList)
+            let hash: string = await calculatehash(waituploadFile.chunkList) as string
+            waituploadFile.hash = hash
             console.log(hash)
             // hash计算完成，更新待计算文件数组
             this.waitCalculateFiles.shift()
@@ -82,8 +84,8 @@ export default class DisposeAllData implements UtilClassInterface {
 
             // 初始化上传进度数组
             waituploadFile.uploadPercentArr = new Array(waituploadFile.chunkList.length).fill(0)
-            console.log(waituploadFile)
-            waituploadFile.hash = hash
+
+            
             // 更新计算完成文件数组
             this.addCalculatedFile(waituploadFile)
             // 上报新的待计算文件数组
@@ -122,10 +124,10 @@ export default class DisposeAllData implements UtilClassInterface {
      * @param waitUploadFile 待上传文件
      */
     private async upload(waitUploadFile: IwaitUploadFile) {
+        // 获取验证信息, 判断文件是否上传，以及已上传文件的信息，处理断点续传
         let verifyData: any = await this.verifyRequest(waitUploadFile.file.name, waitUploadFile.hash as string)
         verifyData = JSON.parse(verifyData.data)
 
-        console.log(verifyData)
 
         // 文件已经上传完成
         if (verifyData.status === 1) {
@@ -156,6 +158,7 @@ export default class DisposeAllData implements UtilClassInterface {
      * @function 计算已上传的size
      * @param AlreadyUploadList 服务端返回的已上传hash列表
      * @param waitUploadFile 待上传文件
+     * @returns 以上传的切片大小
      */
     private calculeateAlreadyUploadSize(AlreadyUploadList: Array<any>, waitUploadFile: IwaitUploadFile) {
         let loaded:number = 0
@@ -229,4 +232,3 @@ export default class DisposeAllData implements UtilClassInterface {
         })
     }
 }
-
