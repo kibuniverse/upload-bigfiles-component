@@ -1,4 +1,5 @@
 import SparkMD5 from 'spark-md5'
+import {chunkListsFile} from '../interfaces/interfaces'
 
 const createChunkList = async (files: File, chunkSize: number) => {
     let fileChunkList:any[] = []
@@ -13,13 +14,9 @@ const createChunkList = async (files: File, chunkSize: number) => {
         index++;
         cur += chunkSize;
     }
-    // const hash = await calculatehash(fileChunkList)
-    // fileChunkList.forEach((item, index: number) => {
-    //     item.hash = `${hash}_${index}`
-    // })
     return fileChunkList
 }
-const calculatehash = (fileChunkList: any) => (
+const calculatehash = (fileChunkList: Array<chunkListsFile>) => (
     new Promise(reslove => {
         const spark = new SparkMD5.ArrayBuffer()
         let count = 0

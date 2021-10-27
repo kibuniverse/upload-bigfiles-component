@@ -1,5 +1,4 @@
 var express = require('express');
-const path = require('path')
 var app = express();
 var fs = require('fs');
 app.use('*', function (req, res, next) {
@@ -153,7 +152,6 @@ app.post('/verify', async (req, res) => {
     } else {
         console.log('=====> 文件不存在')
         const AlreadyUploadList = await getAlreadyUploadList(hashPath)
-        console.log(AlreadyUploadList)
         res.send(JSON.stringify({
             status: 0,
             msg: '文件不存在',
@@ -175,6 +173,6 @@ app.post('/mergeReq', async (req, res) => {
     res.end()
 })
 
-var server = app.listen(8001, function () {
+app.listen(8001, function () {
     console.log(`访问地址为 http://${ip}:8001`)
 })
