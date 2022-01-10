@@ -17,6 +17,7 @@ const UploadProcess = (props: Iprops) => {
         height: "5px",
         backgroundColor: "#c9c9c9",
         borderRadius: "4px",
+        overflow: "hidden",
       }}
     >
       <div

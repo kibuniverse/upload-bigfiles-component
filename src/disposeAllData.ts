@@ -81,7 +81,7 @@ export default class DisposeAllData implements UtilClassInterface {
         waituploadFile.chunkList
       )) as string;
       waituploadFile.hash = hash;
-      console.log(hash);
+      console.info(hash);
       // hash计算完成，更新待计算文件数组
       this.waitCalculateFiles.shift();
       waituploadFile.chunkList.forEach(
