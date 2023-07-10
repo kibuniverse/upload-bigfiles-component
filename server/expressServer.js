@@ -17,8 +17,10 @@ app.use("*", function (req, res, next) {
 const ip = "127.0.0.1";
 const formidable = require("formidable");
 app.use(express.static("files"));
+app.use(express.static("output"));
+
 //监听路由
-app.post("/file_upload", (req, res) => {
+app.post("/file_upload", async (req, res) => {
   //创建实例
   let form = new formidable.IncomingForm();
   //设置上传文件存放的目录
@@ -26,13 +28,17 @@ app.post("/file_upload", (req, res) => {
   //保持原来的文件的扩展名
   form.keepExtensions = true;
   //解析表单（异步）
-  form.parse(req, function (err, fields, files) {
+  form.parse(req, async function (err, fields, files) {
     //打印普通参数
     if (err) {
       console.log(`解析失败 ${err}`);
       return;
     }
     console.log(fields, "fields");
+    console.log(__dirname);
+    if (!fs.existsSync(`${__dirname}/uploads`)) {
+      fs.mkdirSync(`${__dirname}/uploads`);
+    }
     fs.mkdir(
       `${__dirname}/uploads/${fields.fileName}`,
       { recursive: true },
@@ -40,7 +46,6 @@ app.post("/file_upload", (req, res) => {
         if (err) {
           console.log("创建文件夹出错:" + err);
         } else {
-          console.log(files, "dddddddd");
           let oldPath = __dirname + "/" + files.fileData.path;
           let newPath = `${__dirname}/uploads/${fields.fileName}/${fields.hash}`;
           console.log("oldPath", oldPath);
@@ -55,7 +60,6 @@ app.post("/file_upload", (req, res) => {
         res.end();
       }
     );
-    //打印当前文件信息
   });
 });
 /**
@@ -194,5 +198,15 @@ app.post("/mergeReq", async (req, res) => {
 });
 
 app.listen(8001, function () {
+  init();
   console.log(`访问地址为 http://${ip}:8001`);
 });
+
+function init() {
+  if (!fs.existsSync(`${__dirname}/uploads`)) {
+    fs.mkdirSync(`${__dirname}/uploads`);
+  }
+  if (!fs.existsSync(`${__dirname}/files`)) {
+    fs.mkdirSync(`${__dirname}/files`);
+  }
+}
